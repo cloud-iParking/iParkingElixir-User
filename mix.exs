@@ -30,9 +30,10 @@ defmodule ApiTest.MixProject do
       {:jsonapi, "~> 0.7.0"},
       {:mongodb, "~> 0.5.1"},
       {:timex, "~> 3.7.3"},
-      {:plug, "~> 1.0"},
-      {:corsica, "~> 1.0"},
-      {:tzdata, "== 1.0.0", override: true}
+      {:cors, "~> 0.1.1"},
+      {:cors_plug, "~> 2.0"},
+      {:tzdata, "== 1.0.0", override: true},
+      {:joken, "~> 2.0"}
     ]
   end
 end

@@ -11,10 +11,20 @@ defmodule Api.EndpointUsers do
   @api_scheme Application.get_env(:api_test, :api_scheme)
 
   plug :match
+  # plug CORSPlug, origins: "*", allow_headers: ["content-type"]
+
   plug :dispatch
   plug JsonTestPlug
+  plug Api.AuthPlug
   plug :encode_response
-  plug Corsica, origins: "http://localhost:4200"
+
+ # plug Corsica, origins: "*", allow_headers: ["content-type"]
+
+
+  # plug CORSPlug, origins: "*",
+  #               log: [rejected: :error, invalid: :warn, accepted: :debug],
+  #               allow_headers: ["content-type"],
+  #               allow_credentials: true
 
   defp encode_response(conn, _) do
     conn

@@ -41,19 +41,19 @@ defmodule Api.Router do
 
         true ->
           case User.getUser(username, password) do
-          {:ok, user} ->
+            {:ok, user} ->
 
-            {:ok, service} = Api.Service.Auth.start_link
-            token = Api.Service.Auth.issue_token(service, %{:id => id})
+              {:ok, service} = Api.Service.Auth.start_link
+              token = Api.Service.Auth.issue_token(service, %{:id => id})
 
-            conn
-            |> put_status(200)
-            |> assign(:jsonapi, user)
+              conn
+              |> put_status(200)
+              |> assign(:jsonapi,  %{:token => token})
 
-          :error ->
-            conn
-            |> put_status(404)
-            |> assign(:jsonapi, %{"error" => "'user' not found"})
+            :error ->
+              conn
+              |> put_status(404)
+              |> assign(:jsonapi, %{"error" => "'user' not found"})
         end
     end
   end

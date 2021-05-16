@@ -163,36 +163,35 @@ defmodule Api.EndpointUsers do
 end
 
 
-  post "/login", private: %{view: LoginView} do
-    {username, password} = {
-      Map.get(conn.params, "username", nil),
-      Map.get(conn.params, "password", nil)
-    }
+  # post "/login", private: %{view: LoginView} do
+  #   {username, password} = {
+  #     Map.get(conn.params, "username", nil),
+  #     Map.get(conn.params, "password", nil)
+  #   }
 
-    cond do
-      is_nil(username) ->
-        conn
-        |> put_status(400)
-        |> assign(:jsonapi, %{error: "username must be present!"})
+  #   cond do
+  #     is_nil(username) ->
+  #       conn
+  #       |> put_status(400)
+  #       |> assign(:jsonapi, %{error: "username must be present!"})
 
-      is_nil(password) ->
-        conn
-        |> put_status(400)
-        |> assign(:jsonapi, %{error: "password must be present!"})
+  #     is_nil(password) ->
+  #       conn
+  #       |> put_status(400)
+  #       |> assign(:jsonapi, %{error: "password must be present!"})
 
-        true ->
-          case User.getUser(username, password) do
-          {:ok, user} ->
-            conn
-            |> put_status(200)
-            |> assign(:jsonapi, user)
+  #       true ->
+  #         case User.getUser(username, password) do
+  #         {:ok, user} ->
+  #           conn
+  #           |> put_status(200)
+  #           |> assign(:jsonapi, user)
 
-          :error ->
-            conn
-            |> put_status(404)
-            |> assign(:jsonapi, %{"error" => "'user' not found"})
-        end
-    end
-  end
-
+  #         :error ->
+  #           conn
+  #           |> put_status(404)
+  #           |> assign(:jsonapi, %{"error" => "'user' not found"})
+  #       end
+  #   end
+  # end
 end

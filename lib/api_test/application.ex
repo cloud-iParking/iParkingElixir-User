@@ -20,6 +20,8 @@ defmodule ApiTest.Application do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: ApiTest.Supervisor]
     Supervisor.start_link(children, opts)
+
+    Api.Service.Publisher.start_link
   end
 
   defp api_port, do: Application.get_env(:api_test, :api_port)

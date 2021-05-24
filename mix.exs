@@ -33,7 +33,10 @@ defmodule ApiTest.MixProject do
       {:cors, "~> 0.1.1"},
       {:cors_plug, "~> 2.0"},
       {:tzdata, "== 1.0.0", override: true},
-      {:joken, "~> 2.0"}
+      {:joken, "~> 2.0"},
+      {:amqp, "~> 2.1"},
+      {:pbkdf2_elixir, "== 0.11.0", override: true},
+      {:comeonin, "~> 4.0-rc"},
     ]
   end
 end

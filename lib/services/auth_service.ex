@@ -12,7 +12,7 @@ defmodule Api.Service.Auth do
     GenServer.start_link(__MODULE__, [])
   end
 
-   def verify_hash(server, {password, hash}) do
+  def verify_hash(server, {password, hash}) do
     GenServer.call(server, {:verify_hash, {password, hash}})
   end
 

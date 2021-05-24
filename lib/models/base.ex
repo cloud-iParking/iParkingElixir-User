@@ -10,16 +10,16 @@ defmodule Api.Models.Base do
       def get(id) do
         case Mongo.find_one(:mongo, @db_table, %{id: id}) do
           nil ->
-            :error
+            nil
           doc ->
             {:ok, doc |> MapHelper.string_keys_to_atoms |> merge_to_struct}
         end
       end
 
-      def getUser(username, password) do
-        case Mongo.find_one(:mongo, @db_table, %{username: username, password: password}) do
+      def getUser(username) do
+        case Mongo.find_one(:mongo, @db_table, %{username: username}) do
           nil ->
-            :error
+            nil
           doc ->
             {:ok, doc |> MapHelper.string_keys_to_atoms |> merge_to_struct}
         end

@@ -1,6 +1,11 @@
 defmodule Api.Router do
   use Plug.Router
 
+  alias Api.Service.Publisher
+
+  @routing_keys Application.get_env(:api_test, :routing_keys)
+
+
   plug CORSPlug, origins: "*", allow_headers: ["content-type"]
   plug(:match)
 
@@ -18,14 +23,13 @@ defmodule Api.Router do
 
   defp encode_response(conn, _) do
     conn
-    |>send_resp(conn.status, conn.assigns |> Map.get(:jsonapi, %{}) |> Poison.encode!)
+    |>send_resp(conn.status, conn.assigns|> Map.get(:jsonapi, %{}) |> Poison.encode!)
   end
 
   post "/login", private: %{view: LoginView} do
-    {username, password, id} = {
+    {username, password} = {
       Map.get(conn.params, "username", nil),
-      Map.get(conn.params, "password", nil),
-      Map.get(conn.params, "id", nil),
+      Map.get(conn.params, "password", nil)
     }
 
     cond do
@@ -40,27 +44,62 @@ defmodule Api.Router do
         |> assign(:jsonapi, %{error: "password must be present!"})
 
         true ->
-          case User.getUser(username, password) do
+          case User.getUser(username) do
             {:ok, user} ->
 
               {:ok, service} = Api.Service.Auth.start_link
-              token = Api.Service.Auth.issue_token(service, %{:id => id})
 
-              conn
-              |> put_status(200)
-              |> assign(:jsonapi,  %{:token => token})
+              case Api.Service.Auth.verify_hash(service, {password, user.password}) do
+                true ->
+                  token = Api.Service.Auth.issue_token(service, %{:id => user.id})
 
-            :error ->
-              conn
-              |> put_status(404)
-              |> assign(:jsonapi, %{"error" => "'user' not found"})
+                  #publishing login event
+                  Publisher.publish(
+                  @routing_keys |> Map.get("user_login"), Map.take(user, [:id, :username]))
+
+                  conn
+                  |> put_status(200)
+                  |> assign(:userId,  %{:id => user.id}) #claims, id
+                  |> assign(:jsonapi, %{:token => token})
+                false ->
+                    conn
+                    |> put_status(404)
+                    |> assign(:jsonapi, %{"error" => "'password' is wrong"})
+              end
+              :error ->
+                conn
+                |> put_status(404)
+                |> assign(:jsonapi, %{"error" => "'user' not found"})
         end
+      end
+  end
+
+  post "/logout" do
+
+    {id} = {
+      Map.get(conn.params, "id", nil)
+    }
+
+    {:ok, service} = Api.Service.Auth.start_link
+
+    #id = conn.assigns.[:userId]
+
+    case Api.Service.Auth.revoke_token(service, %{:id => id}) do
+      :ok ->
+        Publisher.publish(@routing_keys |> Map.get("user_logout"), %{:id => id})
+
+        conn
+        |> put_status(200)
+        |> assign(:jsonapi, %{"message" => "logged out: #{id}, token deleted"})
+      :error ->
+        conn
+        |> put_status(400)
+        |> assign(:jsonapi, %{"message" => "Could not log out. problem! Please log in."})
+
     end
   end
 
   forward("/user", to: Api.EndpointUsers)
-
-  # forward("/bands", to: Api.Endpoint)
 
   match _ do
     conn

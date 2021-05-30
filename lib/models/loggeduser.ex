@@ -11,6 +11,7 @@ defstruct [
   :carNumber,
   :isBlocked,
   :isAdmin,
-  :token
+  :token,
+  :reportNumber
   ]
 end

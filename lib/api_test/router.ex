@@ -69,7 +69,8 @@ defmodule Api.Router do
                     carNumber: user.carNumber,
                     isBlocked: user.isBlocked,
                     isAdmin: user.isAdmin, 
-                    token: token}
+                    token: token,
+                    reportNumber: user.reportNumber}
 
                   conn
                   |> put_status(200)

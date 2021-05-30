@@ -1,6 +1,8 @@
 defmodule Api.EndpointUsers do
   use Plug.Router
 
+  plug CORSPlug, origins: "*", allow_headers: ["content-type"]
+
   alias Api.Views.UserView
   alias Api.Models.User
   alias Api.Views.LoginView
@@ -108,7 +110,8 @@ defmodule Api.EndpointUsers do
                     password: Api.Service.Auth.generate_hash(service, password),
                     carNumber: carNumber,
                     isBlocked: false,
-                    isAdmin: false} |> User.saveUser do
+                    isAdmin: false,
+                    reportNumber: 0} |> User.saveUser do
                   {:ok, createdEntry} -> uri = "#{@api_scheme}://#{@api_host}:#{@api_port}#{conn.request_path}/"
 
             Publisher.publish(@routing_keys |> Map.get("user_register"), %{:id => id, :name => username})
@@ -152,7 +155,8 @@ defmodule Api.EndpointUsers do
                 password: user.password,
                 carNumber: user.carNumber,
                 isBlocked: true,
-                isAdmin: user.isAdmin} |> User.saveUser do
+                isAdmin: user.isAdmin,
+                reportNumber: user.reportNumber} |> User.saveUser do
       {:ok, createdEntry} ->
         conn
         |> put_status(200)

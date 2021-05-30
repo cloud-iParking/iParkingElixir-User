@@ -14,6 +14,7 @@ defstruct [
   :password,
   :carNumber,
   :isBlocked,
-  :isAdmin
+  :isAdmin,
+  :reportNumber
   ]
 end

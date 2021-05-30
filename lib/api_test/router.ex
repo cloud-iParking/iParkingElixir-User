@@ -19,7 +19,9 @@ defmodule Api.Router do
 
   alias Api.Views.UserView
   alias Api.Models.User
+  alias Api.Models.LoggedUser
   alias Api.Views.LoginView
+  alias Api.Views.LoggedUserView
 
   defp encode_response(conn, _) do
     conn
@@ -57,10 +59,23 @@ defmodule Api.Router do
                   Publisher.publish(
                   @routing_keys |> Map.get("user_login"), Map.take(user, [:id, :username]))
 
+                  loggedUser = %{ id: user.id,
+                    lastName: user.lastName,
+                    firstName: user.firstName,
+                    username: user.username,
+                    phone: user.phone,
+                    email: user.email,
+                    password: user.password,
+                    carNumber: user.carNumber,
+                    isBlocked: user.isBlocked,
+                    isAdmin: user.isAdmin, 
+                    token: token}
+
                   conn
                   |> put_status(200)
-                  |> assign(:userId,  %{:id => user.id}) #claims, id
-                  |> assign(:jsonapi, %{:token => token})
+                  #|> assign(:userId,  %{:id => user.id}) #claims, id
+                  #|> assign(:jsonapi, %{:token => token})
+                  |> assign(:jsonapi, loggedUser)
                 false ->
                     conn
                     |> put_status(404)

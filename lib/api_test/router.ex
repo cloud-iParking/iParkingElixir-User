@@ -90,7 +90,7 @@ defmodule Api.Router do
       end
   end
 
-  post "/logout" do
+  post "/logout", private: %{view: UserView} do
 
     {id} = {
       Map.get(conn.params, "id", nil)

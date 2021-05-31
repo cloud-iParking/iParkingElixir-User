@@ -1,7 +1,14 @@
 defmodule Api.EndpointUsers do
   use Plug.Router
 
-  plug CORSPlug, origins: "*", allow_headers: ["content-type"]
+  plug (:match)
+  plug(Plug.Parsers,
+  parsers: [:json],
+  pass: ["application/json"],
+  json_decoder: Poison
+  )
+
+  plug :dispatch
 
   alias Api.Views.UserView
   alias Api.Models.User
@@ -16,9 +23,7 @@ defmodule Api.EndpointUsers do
   @api_host Application.get_env(:api_test, :api_host)
   @api_scheme Application.get_env(:api_test, :api_scheme)
 
-  plug :match
-
-  plug :dispatch
+ 
   plug JsonTestPlug
   plug Api.AuthPlug
   plug :encode_response
@@ -133,7 +138,7 @@ defmodule Api.EndpointUsers do
       end
   end
 
-  patch "/:username", private: %{view: UserView} do
+  patch "/block", private: %{view: UserView} do
 
     {username} = {
       Map.get(conn.params, "username", nil)
@@ -154,7 +159,7 @@ defmodule Api.EndpointUsers do
                 email: user.email,
                 password: user.password,
                 carNumber: user.carNumber,
-                isBlocked: true,
+                isBlocked: !user.isBlocked,
                 isAdmin: user.isAdmin,
                 reportNumber: user.reportNumber} |> User.saveUser do
       {:ok, createdEntry} ->
